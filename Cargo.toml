@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "programs/degree-registry"
+]
+
+[profile.release]
+overflow-checks = true
