@@ -1,0 +1,19 @@
+[package]
+name = "degree-registry"
+version = "0.1.0"
+description = "AlmaChain: Soulbound Academic Credentialing Protocol on Solana - NIT Silchar"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "degree_registry"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.24.2"
