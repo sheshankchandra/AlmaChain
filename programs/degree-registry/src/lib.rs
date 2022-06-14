@@ -20,6 +20,23 @@ pub mod degree_registry {
         graduation_year: u16,
         cgpa: u16,
     ) -> Result<()> {
+        require!(
+            roll_number.len() <= DegreeRecord::MAX_ROLL_NUMBER_LEN,
+            ErrorCode::RollNumberTooLong
+        );
+        require!(
+            student_name.len() <= DegreeRecord::MAX_STUDENT_NAME_LEN,
+            ErrorCode::NameTooLong
+        );
+        require!(
+            degree_title.len() <= DegreeRecord::MAX_DEGREE_TITLE_LEN,
+            ErrorCode::DegreeTitleTooLong
+        );
+        require!(
+            cgpa <= 1000,
+            ErrorCode::InvalidCgpa
+        );
+
         let degree_record = &mut ctx.accounts.degree_record;
         let clock = Clock::get()?;
 
