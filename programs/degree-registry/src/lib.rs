@@ -53,6 +53,19 @@ pub mod degree_registry {
 
         Ok(())
     }
+
+    pub fn revoke_degree(ctx: Context<RevokeDegree>) -> Result<()> {
+        let degree_record = &mut ctx.accounts.degree_record;
+
+        require!(
+            degree_record.status != CredentialStatus::Revoked,
+            ErrorCode::AlreadyRevoked
+        );
+
+        degree_record.status = CredentialStatus::Revoked;
+
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]
@@ -77,4 +90,21 @@ pub struct IssueDegree<'info> {
     pub student_wallet: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct RevokeDegree<'info> {
+    #[account(
+        mut,
+        has_one = university @ ErrorCode::UnauthorizedIssuer,
+        seeds = [
+            b"degree",
+            degree_record.university.as_ref(),
+            degree_record.roll_number.as_bytes()
+        ],
+        bump = degree_record.bump
+    )]
+    pub degree_record: Account<'info, DegreeRecord>,
+
+    pub university: Signer<'info>,
 }
