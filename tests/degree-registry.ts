@@ -65,4 +65,51 @@ describe("AlmaChain protocol integration tests", () => {
     assert.equal(record.studentName, studentName);
     assert.deepEqual(record.status, { active: {} });
   });
+
+  it("2. Deterministic Lookup: Resolves credential using ONLY PDA seeds without prior address knowledge", async () => {
+    const [lookupAddress] = await PublicKey.findProgramAddress(
+      [
+        Buffer.from("degree"),
+        university.publicKey.toBuffer(),
+        Buffer.from("1913128"),
+      ],
+      program.programId
+    );
+
+    assert.equal(lookupAddress.toBase58(), degreePda.toBase58());
+    const verifiedRecord = await program.account.degreeRecord.fetch(lookupAddress);
+    assert.equal(verifiedRecord.studentName, "Sheshank Chandra Pothu");
+  });
+
+  it("3. Immutability / Re-issuance Prevention: Re-issuing the same roll number fails", async () => {
+    try {
+      await program.methods
+        .issueDegree(
+          rollNumber,
+          "Fraudulent Student Name",
+          "M.Tech Data Science",
+          2024,
+          999
+        )
+        .accounts({
+          degreeRecord: degreePda,
+          university: university.publicKey,
+          studentWallet: Keypair.generate().publicKey,
+          systemProgram: SystemProgram.programId,
+        })
+        .signers([university])
+        .rpc();
+
+      assert.fail("Transaction should have failed because the PDA is already initialized");
+    } catch (err: any) {
+      expect(err.toString()).to.satisfy((msg: string) => {
+        return (
+          msg.includes("already in use") ||
+          msg.includes("custom program error: 0x0") ||
+          msg.includes("Instruction: Initialize") ||
+          msg.includes("failed to send transaction")
+        );
+      });
+    }
+  });
 });
