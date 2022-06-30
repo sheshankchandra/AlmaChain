@@ -1,0 +1,193 @@
+{
+  "version": "0.1.0",
+  "name": "degree_registry",
+  "instructions": [
+    {
+      "name": "issueDegree",
+      "accounts": [
+        {
+          "name": "degreeRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "university",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "studentWallet",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "rollNumber",
+          "type": "string"
+        },
+        {
+          "name": "studentName",
+          "type": "string"
+        },
+        {
+          "name": "degreeTitle",
+          "type": "string"
+        },
+        {
+          "name": "graduationYear",
+          "type": "u16"
+        },
+        {
+          "name": "cgpa",
+          "type": "u16"
+        }
+      ]
+    },
+    {
+      "name": "revokeDegree",
+      "accounts": [
+        {
+          "name": "degreeRecord",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "university",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DegreeRecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "university",
+            "type": "publicKey"
+          },
+          {
+            "name": "studentWallet",
+            "type": "publicKey"
+          },
+          {
+            "name": "rollNumber",
+            "type": "string"
+          },
+          {
+            "name": "studentName",
+            "type": "string"
+          },
+          {
+            "name": "degreeTitle",
+            "type": "string"
+          },
+          {
+            "name": "graduationYear",
+            "type": "u16"
+          },
+          {
+            "name": "cgpa",
+            "type": "u16"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": "CredentialStatus"
+            }
+          },
+          {
+            "name": "issuedAt",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "CredentialStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Revoked"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "RollNumberTooLong",
+      "msg": "Student roll number exceeds the maximum allowed length of 16 characters."
+    },
+    {
+      "code": 6001,
+      "name": "NameTooLong",
+      "msg": "Student name exceeds the maximum allowed length of 48 characters."
+    },
+    {
+      "code": 6002,
+      "name": "DegreeTitleTooLong",
+      "msg": "Degree title exceeds the maximum allowed length of 64 characters."
+    },
+    {
+      "code": 6003,
+      "name": "AlreadyRevoked",
+      "msg": "This academic credential has already been revoked and cannot be revoked again."
+    },
+    {
+      "code": 6004,
+      "name": "UnauthorizedIssuer",
+      "msg": "Unauthorized: Signer does not match the original university authority for this credential."
+    },
+    {
+      "code": 6005,
+      "name": "InvalidCgpa",
+      "msg": "Invalid CGPA: Must be between 0 and 1000 (representing 0.00 to 10.00)."
+    }
+  ],
+  "events": [
+    {
+      "name": "DegreeConferredEvent",
+      "fields": [
+        { "name": "university", "type": "publicKey", "index": false },
+        { "name": "studentWallet", "type": "publicKey", "index": false },
+        { "name": "rollNumber", "type": "string", "index": false },
+        { "name": "graduationYear", "type": "u16", "index": false },
+        { "name": "cgpa", "type": "u16", "index": false },
+        { "name": "issuedAt", "type": "i64", "index": false }
+      ]
+    },
+    {
+      "name": "DegreeRevokedEvent",
+      "fields": [
+        { "name": "university", "type": "publicKey", "index": false },
+        { "name": "rollNumber", "type": "string", "index": false },
+        { "name": "revokedAt", "type": "i64", "index": false }
+      ]
+    }
+  ],
+  "metadata": {
+    "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+  }
+}
